@@ -21,7 +21,7 @@ const log = (msg: string) => {
 
 const handler = (req: Request) => {
   const url = new URL(req.url);
-  if (req.method === 'GET') {
+  if (req.method === 'GET') {                                     // GET
     if (url.pathname === '/') {
       return servePage('index.html')
     } else if (url.pathname === '/alchat') {

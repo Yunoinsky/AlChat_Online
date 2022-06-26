@@ -51,7 +51,7 @@ const YunoMenu = {
       <el-icon>
         <histogram />
       </el-icon>
-      ALChat 博物学
+      ALChat 来点博物学
     </el-menu-item>
      </el-menu>`,
 };

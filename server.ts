@@ -41,7 +41,7 @@ const handler = (req: Request) => {
 
 };
 
-const port = Deno.args[0];
+const port = parseInt(Deno.args[0]);
 log(`http://localhost:${port}/`)
 
 await serve(handler, { port });

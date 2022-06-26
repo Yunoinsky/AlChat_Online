@@ -41,7 +41,7 @@ const handler = (req: Request) => {
 
 };
 
-const port = 80;
+const port = 2220;
 log(`http://localhost:${port}/`)
 
 await serve(handler, { port });

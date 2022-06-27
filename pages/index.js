@@ -174,7 +174,9 @@ const BookTree = {
       </el-icon>
       <span> umap Embedding </span>
     </el-button>
-  </el-row>`
+  </el-row>
+  <span>如遇网络问题无法下载，可以访问<a href="www.yunoinsky.life:8080">AlChat Data</a></span>`
+
   ,
 
   methods: {

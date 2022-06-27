@@ -194,10 +194,6 @@ const BookTree = {
         method: 'POST',
         body: form,
         responseType: 'blob',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
       })
       response.then((res) => {
         return res.blob();
@@ -207,7 +203,7 @@ const BookTree = {
         a.href = window.URL.createObjectURL(bl);
         a.download = `${fn}.json`;
         a.click();
-        window.URL.revokeObjectURL(link.href);
+        window.URL.revokeObjectURL(a.href);
       })
     }
   }

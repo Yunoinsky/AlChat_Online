@@ -122,11 +122,12 @@ const bookDBArray = [
 
 // const getKey = (prefix, id) => `${prefix}-${id}`;
 const fetchBookData = () => {
+  let id = 0;
   return bookDBArray.map((book) => {
       return {
-      id: book.title,
+      id: id++,
       label: `${book.title} 《${book.ctitle}》`,
-      children: undefined
+      children: undefined,
     };
   });
 };
@@ -141,11 +142,44 @@ const BookTree = {
         children: "children",
       },
       query: Vue.ref(''),
-      treeRef: Vue.ref()
+      treeRef: Vue.ref(),
+      bookDBArray: bookDBArray,
+      selectID: 0,
     };
   },
   template: `
-  <el-tree-v2 :props=props :data="data" :height="400"></el-tree-v2>`,
+  <el-tree-v2 :props=props :highlight-current="true" :data="data" :height="400" @node-click="nodeClick"></el-tree-v2>
+  <el-descriptions title="Book Info" :column="1" :size="'small'" border>
+    <el-descriptions-item label="Title"><em> {{ bookDBArray[selectID].title }} </em></el-descriptions-item>
+    <el-descriptions-item label="标题"> {{ '《'+bookDBArray[selectID].ctitle+'》' }} </el-descriptions-item>
+    <el-descriptions-item label="Author"> {{ bookDBArray[selectID].author }} </el-descriptions-item>
+    <el-descriptions-item label="作者"> {{ bookDBArray[selectID].cauthor }} </el-descriptions-item>
+    <el-descriptions-item label="url"><a :href="bookDBArray[selectID].url"> {{ bookDBArray[selectID].url }} </a></el-descriptions-item>
+  </el-descriptions>
+  <el-row class="mb-4">
+    <el-button>
+      <el-icon>
+        <download />
+      </el-icon>
+      <span>Book Download</span>
+    </el-button>
+    <el-button>
+      <el-icon>
+        <grape />
+      </el-icon>
+      <span> umap Embedding </span>
+    </el-button>
+  </el-row>`
+
+  ,
+
+  methods: {
+    nodeClick(data, node) {
+      if (node.level==1){
+        this.selectID = data.id;
+      }
+    }
+  }
 };
 
 const YunoPage = {
@@ -161,10 +195,11 @@ const YunoPage = {
       </el-header>
       <el-container>
         <el-aside>
-        <book-tree></book-tree>
+          <book-tree></book-tree>
         </el-aside>
         <el-main>
           Coming Soon!
+          <div id="tester" style="width:600px;height:250px;"></div>
         </el-main>
       </el-container>
       <el-footer>
@@ -176,3 +211,7 @@ const YunoPage = {
 app.component("yuno-page", YunoPage);
 app.component("book-tree", BookTree);
 app.mount(".index");
+
+TESTER = document.getElementById('tester');
+	
+Plotly.newPlot( TESTER, [{x: [1, 2, 3, 4, 5],y: [1, 2, 4, 8, 16] }], {margin: { t: 0 }, title: "test plot" } );

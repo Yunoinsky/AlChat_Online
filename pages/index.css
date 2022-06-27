@@ -19,6 +19,10 @@
     background-color: #d9ecff;
 }
 
+
+.el-descriptions-item {
+    width: 350px;
+}
 .el-tree {
     background-color: #F0F2F5;
     border-style: dashed;
@@ -38,4 +42,9 @@
     height: 4vh;
     width: 100%;
     align-items: center;
+}
+
+.el-row {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

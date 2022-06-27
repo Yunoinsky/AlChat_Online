@@ -171,7 +171,7 @@ const BookTree = {
       <el-icon>
         <grape />
       </el-icon>
-      <span> umap Embedding </span>
+      <span> Plot QC </span>
     </el-button>
   </el-row>
   <el-row class="mb-4">
@@ -179,7 +179,7 @@ const BookTree = {
       <el-icon>
         <grape />
       </el-icon>
-      <span> Plot QC </span>
+      <span> Plot 2D UMAP </span>
     </el-button>
     <el-button @click="this.onPlot(2)">
       <el-icon>

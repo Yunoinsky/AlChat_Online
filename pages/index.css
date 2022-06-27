@@ -14,11 +14,21 @@
     justify-content: space-between;
 }
 
+.linkcloze {
+    font-size: var(--el-font-size-base);
+    font-weight: var(--el-font-weight-base);
+}
+
 .el-aside {
     width: 350px;
     background-color: #d9ecff;
 }
 
+#ploter {
+    width: 600px;
+    height: 600px;
+    scale: 50%;
+}
 
 .el-descriptions-item {
     width: 350px;

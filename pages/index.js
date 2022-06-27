@@ -1,4 +1,3 @@
-
 const App = {
   data() {
     return {
@@ -153,7 +152,7 @@ const BookTree = {
     };
   },
   template: `
-  <el-tree-v2 :props=props :highlight-current="true" :data="data" :height="400" @node-click="nodeClick"></el-tree-v2>
+  <el-tree-v2 :props=props :highlight-current="true" :data="data" :height="300" @node-click="nodeClick"></el-tree-v2>
   <el-descriptions title="Book Info" :column="1" :size="'small'" border>
     <el-descriptions-item label="Title"><em> {{ bookDBArray[selectID].title }} </em></el-descriptions-item>
     <el-descriptions-item label="标题"> {{ '《'+bookDBArray[selectID].ctitle+'》' }} </el-descriptions-item>
@@ -162,21 +161,39 @@ const BookTree = {
     <el-descriptions-item label="url"><a :href="bookDBArray[selectID].url"> {{ bookDBArray[selectID].url }} </a></el-descriptions-item>
   </el-descriptions>
   <el-row class="mb-4">
-    <el-button @click="onDownload">
+  <el-button @click="onDownload">
       <el-icon>
         <download />
       </el-icon>
-      <span>Book Download</span>
+      <span> Book Download</span>
     </el-button>
-    <el-button>
+    <el-button @click="this.onPlot(0)">
       <el-icon>
         <grape />
       </el-icon>
       <span> umap Embedding </span>
     </el-button>
   </el-row>
-  <span>如遇网络问题无法下载，可以访问<a href="http://www.yunoinsky.life:8080/">AlChat Data</a></span>`
-
+  <el-row class="mb-4">
+    <el-button @click="this.onPlot(1)">
+      <el-icon>
+        <grape />
+      </el-icon>
+      <span> Plot QC </span>
+    </el-button>
+    <el-button @click="this.onPlot(2)">
+      <el-icon>
+        <grape />
+      </el-icon>
+      <span> Plot 3D UMAP </span>
+    </el-button>
+  </el-row>
+  <span class="linkcloze">由于带宽限制，后台下载速度缓慢。
+  如难以下载，可访问
+  <el-link type="primary" 
+          href="https://cloud.tsinghua.edu.cn/d/1cc7c1f1001a47b4a94b/" 
+          target="_blank">
+          AlChat Data</el-link></span>`
   ,
 
   methods: {
@@ -190,24 +207,33 @@ const BookTree = {
       const form = new FormData();
       form.append('fileName', fn);
       form.append('downloadType', 'emb');
-      const response = fetch('/download', {
+      fetch('/download', {
         method: 'POST',
         body: form,
         responseType: 'blob',
-        headers: {
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-          'Accept-Encoding': 'gizp, deflate',
-          'Connetion': 'keep-alive',
-
-        }
-      })
-      response.then((res) => {
-        const bl = new Blob([res], {type: "text/javascript"})
+      }).then((res)=> {
+        return res.blob()
+      }).then((data) => {
+        const bl = new Blob([data], {type: "text/javascript"})
         const a = document.createElement("a");
         a.href = window.URL.createObjectURL(bl);
         a.download = `${fn}.json`;
         a.click();
         window.URL.revokeObjectURL(a.href);
+      })
+    },
+    onPlot(ind) {
+      const fn = ['qc_control.json','umap_embedding.json', 'umap_embedding3d.json'];
+      fetch('/plot/'+fn[ind], {
+        method: 'GET',
+        // responseType: 'blob'
+      }).then((res)=>{
+        return res.json()
+      }).then((fig)=>{
+        fig.layout.height=600
+        fig.layout.width=750
+        PLOTER = document.getElementById('ploter');
+        Plotly.newPlot(PLOTER, fig.data, fig.layout)
       })
     }
   }
@@ -230,12 +256,11 @@ const YunoPage = {
           <book-tree></book-tree>
         </el-aside>
         <el-main>
-          Coming Soon!
-          <div id="tester" style="width:600px;height:250px;"></div>
+          <div id="ploter"></div>
         </el-main>
       </el-container>
       <el-footer>
-        <span title="来点籥的昆虫行为学研究日志">京ICP备2022018448号-1 我们目前只完成了这个页面</span>
+        <span title="来点籥的昆虫行为学研究日志">京ICP备2022018448号-1 <em>On developement</em></span>
       </el-footer>
     </el-container>`,
 };
@@ -243,6 +268,6 @@ const YunoPage = {
 app.component("yuno-page", YunoPage);
 app.mount(".index");
 
-TESTER = document.getElementById('tester');
+
 	
-Plotly.newPlot( TESTER, [{x: [1, 2, 3, 4, 5],y: [1, 2, 4, 8, 16] }], {margin: { t: 0 }, title: "test plot" } );
+

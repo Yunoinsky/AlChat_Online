@@ -33,8 +33,9 @@ const handler = async (req: Request) => {
     } else if (url.pathname.startsWith('/static')) {
       const fileName = url.pathname.substring('/static/'.length);
       return serveFile(req, 'pages/'+fileName);
-    } else if (url.pathname.startsWith('/download')) {
-      // const fileName = url.pathname.substring('/filedownload/'.length);
+    } else if (url.pathname.startsWith('/plot')) {
+      const fileName = url.pathname.substring('/plot/'.length);
+      return serveFile(req, '../AlChat/data/result/fig/'+fileName);
     }
   } else if (req.method === 'POST') {
     if (url.pathname.startsWith('/download')) {
@@ -52,7 +53,7 @@ const handler = async (req: Request) => {
       }
       
       return new Response('', {status: 200});
-    }
+    } 
   }
   return new Response('You are entering the void!\n', {status: 404});
 

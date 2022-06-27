@@ -194,11 +194,15 @@ const BookTree = {
         method: 'POST',
         body: form,
         responseType: 'blob',
+        headers: {
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+          'Accept-Encoding': 'gizp, deflate',
+          'Connetion': 'keep-alive',
+
+        }
       })
       response.then((res) => {
-        return res.blob();
-      }).then((data) => {
-        const bl = new Blob([data], {type: "text/javascript"})
+        const bl = new Blob([res], {type: "text/javascript"})
         const a = document.createElement("a");
         a.href = window.URL.createObjectURL(bl);
         a.download = `${fn}.json`;

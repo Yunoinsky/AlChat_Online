@@ -1,3 +1,4 @@
+
 const App = {
   data() {
     return {
@@ -18,17 +19,18 @@ const YunoMenu = {
       activeIndex: "4",
     };
   },
+  props: ["menuIndex"],
   methods: {
     handleSelect(key, _keyPath) {
-        if (key==4) {
-            console.log(key);
-            window.location.href="./alchat";
-        }
+      if (key == 4) {
+        console.log(key);
+        window.location.href = "./alchat";
+      }
     },
   },
 
   template: `
-    <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+    <el-menu :default-active="menuIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
     <el-menu-item index="1" title="集虚纳空，以至心斋">
       <el-icon>
         <home-filled />
@@ -56,6 +58,121 @@ const YunoMenu = {
      </el-menu>`,
 };
 
-app.component("yuno-menu", YunoMenu);
-app.mount(".index");
+const bookDBArray = [
+  {
+    title: "De agri cultura",
+    ctitle: "农业志",
+    author: "Cato",
+    cauthor: "老加图",
+    url: "http://thelatinlibrary.com/cato/cato.agri.html",
+    filename: "De_agri_cultura",
+  },
+  {
+    title: "Res rustica",
+    ctitle: "农事三书",
+    author: "Collumela",
+    cauthor: "科卢麦拉",
+    url: "http://thelatinlibrary.com/columella.html",
+    filename: "Res_rustica",
+  },
+  {
+    title: "Historia naturalis",
+    ctitle: "自然志",
+    author: "Pliny",
+    cauthor: "老普林尼",
+    url:
+      "https://www.perseus.tufts.edu/hopper/text?doc=Perseus%3atext%3a1999.02.0138",
+    filename: "Natura_Histori",
+  },
+  {
+    title: "Collectanea rerum mirabilium",
+    ctitle: "奇物志",
+    author: "Solinus",
+    cauthor: "索里努斯",
+    url: "http://thelatinlibrary.com/solinus5.html",
+    filename: "Collectanea_rerum_mirabilium",
+  },
+  {
+    title: "Etymologiae",
+    ctitle: "词源",
+    author: "Isidore of Seville",
+    cauthor: "塞维利亚的伊西多尔",
+    url:
+      "http://www.fh-augsburg.de/~harsch/Chronologia/Lspost07/Isidorus/isi_et00.html",
+    filename: "Etymologiarum_libri_XX",
+  },
+  {
+    title: "De universo",
+    ctitle: "论万物",
+    author: "Hrabanus Maurus",
+    cauthor: "拉巴努斯·毛鲁斯",
+    url: "http://www.intratext.com/X/LAT0385.HTM",
+    filename: "De_rerum_naturis",
+  },
+  {
+    title: "Physica",
+    ctitle: "自然学",
+    author: "Hildegard of Bingen",
+    cauthor: "宾根的希尔德加尔德",
+    url:
+      "http://www.fh-augsburg.de/~harsch/Chronologia/Lspost12/Hildegard/hil_phy0.html",
+    filename: "Physica_Bingensis",
+  },
+];
 
+// const getKey = (prefix, id) => `${prefix}-${id}`;
+const fetchBookData = () => {
+  return bookDBArray.map((book) => {
+      return {
+      id: book.title,
+      label: `${book.title} 《${book.ctitle}》`,
+      children: undefined
+    };
+  });
+};
+
+const BookTree = {
+  data() {
+    return {
+      data: fetchBookData(4, 30, 40),
+      props: {
+        value: "id",
+        label: "label",
+        children: "children",
+      },
+      query: Vue.ref(''),
+      treeRef: Vue.ref()
+    };
+  },
+  template: `
+  <el-tree-v2 :props=props :data="data" :height="400"></el-tree-v2>`,
+};
+
+const YunoPage = {
+  props: ["pageIndex"],
+  components: {
+    "yuno-menu": YunoMenu,
+  },
+
+  template: `
+    <el-container id="main-container">
+      <el-header>
+        <yuno-menu :menuIndex="pageIndex"></yuno-menu>
+      </el-header>
+      <el-container>
+        <el-aside>
+        <book-tree></book-tree>
+        </el-aside>
+        <el-main>
+          Coming Soon!
+        </el-main>
+      </el-container>
+      <el-footer>
+        <span title="来点籥的昆虫行为学研究日志">京ICP备2022018448号-1 我们目前只完成了这个页面</span>
+      </el-footer>
+    </el-container>`,
+};
+
+app.component("yuno-page", YunoPage);
+app.component("book-tree", BookTree);
+app.mount(".index");

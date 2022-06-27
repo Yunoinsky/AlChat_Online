@@ -6,17 +6,31 @@
     left: 0;
 }
 
-.el-main {
-    height: 100%;
-    overflow: hidden;
-}
-
-.el-container {
+#main-container {
     width: 100%;
     min-height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+}
+
+.el-aside {
+    width: 350px;
+    background-color: #d9ecff;
+}
+
+.el-tree {
+    background-color: #F0F2F5;
+    border-style: dashed;
+    border-color: #DCDFE6;
+    border-width: 5px;
+    padding-top: 20px;
+   
+}
+
+.el-main {
+    height: 100%;
+    overflow: hidden;
 }
 
 .el-footer {

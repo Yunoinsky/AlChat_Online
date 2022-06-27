@@ -190,16 +190,24 @@ const BookTree = {
       const form = new FormData();
       form.append('fileName', fn);
       form.append('downloadType', 'emb');
-      fetch('/download', {
+      const response = fetch('/download', {
         method: 'POST',
-        body: form
-      }).then((res) => {
+        body: form,
+        responseType: 'blob',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+      response.then((res) => {
         return res.blob();
       }).then((data) => {
+        const bl = new Blob([data], {type: "text/javascript"})
         const a = document.createElement("a");
-        a.href = window.URL.createObjectURL(data);
+        a.href = window.URL.createObjectURL(bl);
         a.download = `${fn}.json`;
         a.click();
+        window.URL.revokeObjectURL(link.href);
       })
     }
   }

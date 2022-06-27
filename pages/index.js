@@ -189,6 +189,7 @@ const BookTree = {
     </el-button>
   </el-row>
   <span class="linkcloze">由于带宽限制，后台下载速度缓慢。
+  点击绘图按钮后请稍后片刻。
   如难以下载，可访问
   <el-link type="primary" 
           href="https://cloud.tsinghua.edu.cn/d/1cc7c1f1001a47b4a94b/" 

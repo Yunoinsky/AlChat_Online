@@ -8,10 +8,13 @@ const App = {
 };
 
 const app = Vue.createApp(App);
+
 for (const [key, comp] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, comp);
 }
+
 app.use(ElementPlus);
+
 
 const YunoMenu = {
   data() {
@@ -132,6 +135,8 @@ const fetchBookData = () => {
   });
 };
 
+
+/* 侧边栏 */
 const BookTree = {
   data() {
     return {
@@ -157,7 +162,7 @@ const BookTree = {
     <el-descriptions-item label="url"><a :href="bookDBArray[selectID].url"> {{ bookDBArray[selectID].url }} </a></el-descriptions-item>
   </el-descriptions>
   <el-row class="mb-4">
-    <el-button>
+    <el-button @click="onDownload">
       <el-icon>
         <download />
       </el-icon>
@@ -170,7 +175,6 @@ const BookTree = {
       <span> umap Embedding </span>
     </el-button>
   </el-row>`
-
   ,
 
   methods: {
@@ -178,6 +182,23 @@ const BookTree = {
       if (node.level==1){
         this.selectID = data.id;
       }
+    },
+    onDownload() {
+      const fn = bookDBArray[this.selectID].filename;
+      const form = new FormData();
+      form.append('fileName', fn);
+      form.append('downloadType', 'emb');
+      fetch('/download', {
+        method: 'POST',
+        body: form
+      }).then((res) => {
+        return res.blob();
+      }).then((data) => {
+        const a = document.createElement("a");
+        a.href = window.URL.createObjectURL(data);
+        a.download = `${fn}.json`;
+        a.click();
+      })
     }
   }
 };
@@ -186,6 +207,7 @@ const YunoPage = {
   props: ["pageIndex"],
   components: {
     "yuno-menu": YunoMenu,
+    "book-tree": BookTree
   },
 
   template: `
@@ -209,7 +231,6 @@ const YunoPage = {
 };
 
 app.component("yuno-page", YunoPage);
-app.component("book-tree", BookTree);
 app.mount(".index");
 
 TESTER = document.getElementById('tester');

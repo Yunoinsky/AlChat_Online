@@ -19,7 +19,7 @@ const log = (msg: string) => {
   console.log(`${(new Date()).toISOString()} ${msg}`);
 };
 
-const handler = (req: Request) => {
+const handler = async (req: Request) => {
   const url = new URL(req.url);
   if (req.method === 'GET') {                                     // GET
     if (url.pathname === '/') {
@@ -33,9 +33,26 @@ const handler = (req: Request) => {
     } else if (url.pathname.startsWith('/static')) {
       const fileName = url.pathname.substring('/static/'.length);
       return serveFile(req, 'pages/'+fileName);
+    } else if (url.pathname.startsWith('/download')) {
+      // const fileName = url.pathname.substring('/filedownload/'.length);
     }
   } else if (req.method === 'POST') {
-    return new Response('', {status: 200});
+    if (url.pathname.startsWith('/download')) {
+      try {
+        const body = await req.formData();
+        const dType = body.get('downloadType')
+        const fn = body.get('fileName')
+        if (dType ==='emb') {
+          log(`Downloading ${body.get('fileName')} ${body.get('downloadType')}`)
+          const fpath = `../AlChat/data/embedding/${fn}_embedding.json`;
+          return serveFile(req, fpath);
+        }
+      } catch {
+        return new Response('', { status: 400 });
+      }
+      
+      return new Response('', {status: 200});
+    }
   }
   return new Response('You are entering the void!\n', {status: 404});
 

@@ -14,7 +14,6 @@ for (const [key, comp] of Object.entries(ElementPlusIconsVue)) {
 
 app.use(ElementPlus);
 
-
 const YunoMenu = {
   data() {
     return {
@@ -60,7 +59,7 @@ const YunoMenu = {
      </el-menu>`,
 };
 
-const bookDBArray = [
+const workDBArray = [
   {
     title: "De agri cultura",
     ctitle: "农业志",
@@ -78,7 +77,7 @@ const bookDBArray = [
     filename: "Res_rustica",
   },
   {
-    title: "Historia naturalis",
+    title: "Natura Histori",
     ctitle: "自然志",
     author: "Pliny",
     cauthor: "老普林尼",
@@ -95,7 +94,7 @@ const bookDBArray = [
     filename: "Collectanea_rerum_mirabilium",
   },
   {
-    title: "Etymologiae",
+    title: "Etymologiarum libri XX",
     ctitle: "词源",
     author: "Isidore of Seville",
     cauthor: "塞维利亚的伊西多尔",
@@ -104,7 +103,7 @@ const bookDBArray = [
     filename: "Etymologiarum_libri_XX",
   },
   {
-    title: "De universo",
+    title: "De rerum naturis",
     ctitle: "论万物",
     author: "Hrabanus Maurus",
     cauthor: "拉巴努斯·毛鲁斯",
@@ -112,7 +111,7 @@ const bookDBArray = [
     filename: "De_rerum_naturis",
   },
   {
-    title: "Physica",
+    title: "Physica Bingensis",
     ctitle: "自然学",
     author: "Hildegard of Bingen",
     cauthor: "宾根的希尔德加尔德",
@@ -123,49 +122,63 @@ const bookDBArray = [
 ];
 
 // const getKey = (prefix, id) => `${prefix}-${id}`;
-const fetchBookData = () => {
+async function fetchWorkData() {
+  const res = await fetch("/content/contents_ref.json", { method: "GET" });
+  const contents = await res.json();
   let id = 0;
-  return bookDBArray.map((book) => {
-      return {
+  const r = workDBArray.map((work) => {
+    let bid = 0;
+    return {
       id: id++,
-      label: `${book.title} 《${book.ctitle}》`,
-      children: undefined,
+      label: `${work.title} 《${work.ctitle}》`,
+      children: contents[work.title.replace(/ /g, "_") + "_embedding"].map(
+        (book) => {
+          return {
+            id: `${id}-${bid++}`,
+            label: book.bki,
+            children: undefined,
+          };
+        }
+      ),
     };
   });
-};
-
+  return r;
+}
 
 /* 侧边栏 */
-const BookTree = {
+const WorkTree = {
   data() {
     return {
-      data: fetchBookData(4, 30, 40),
+      contents: [],
       props: {
         value: "id",
         label: "label",
         children: "children",
       },
-      query: Vue.ref(''),
-      treeRef: Vue.ref(),
-      bookDBArray: bookDBArray,
+      // query: Vue.ref(""),
+      // treeRef: Vue.ref(),
+      workDBArray: workDBArray,
       selectID: 0,
     };
   },
+  async created() {
+    this.contents =  await fetchWorkData();
+  },
   template: `
-  <el-tree-v2 :props=props :highlight-current="true" :data="data" :height="300" @node-click="nodeClick"></el-tree-v2>
-  <el-descriptions title="Book Info" :column="1" :size="'small'" border>
-    <el-descriptions-item label="Title"><em> {{ bookDBArray[selectID].title }} </em></el-descriptions-item>
-    <el-descriptions-item label="标题"> {{ '《'+bookDBArray[selectID].ctitle+'》' }} </el-descriptions-item>
-    <el-descriptions-item label="Author"> {{ bookDBArray[selectID].author }} </el-descriptions-item>
-    <el-descriptions-item label="作者"> {{ bookDBArray[selectID].cauthor }} </el-descriptions-item>
-    <el-descriptions-item label="url"><a :href="bookDBArray[selectID].url"> {{ bookDBArray[selectID].url }} </a></el-descriptions-item>
+  <el-tree-v2 :props="props" :data="contents" :height="300" @node-click="nodeClick"></el-tree-v2>
+  <el-descriptions title="Work Info" :column="1" :size="'small'" border>
+    <el-descriptions-item label="Title"><em> {{ workDBArray[selectID].title }} </em></el-descriptions-item>
+    <el-descriptions-item label="标题"> {{ '《'+workDBArray[selectID].ctitle+'》' }} </el-descriptions-item>
+    <el-descriptions-item label="Author"> {{ workDBArray[selectID].author }} </el-descriptions-item>
+    <el-descriptions-item label="作者"> {{ workDBArray[selectID].cauthor }} </el-descriptions-item>
+    <el-descriptions-item label="url"><a :href="workDBArray[selectID].url"> {{ workDBArray[selectID].url }} </a></el-descriptions-item>
   </el-descriptions>
   <el-row class="mb-4">
   <el-button @click="onDownload">
       <el-icon>
         <download />
       </el-icon>
-      <span> Book Download</span>
+      <span> Work Download</span>
     </el-button>
     <el-button @click="this.onPlot(0)">
       <el-icon>
@@ -194,57 +207,60 @@ const BookTree = {
   <el-link type="primary" 
           href="https://cloud.tsinghua.edu.cn/d/1cc7c1f1001a47b4a94b/" 
           target="_blank">
-          AlChat Data</el-link></span>`
-  ,
+          AlChat Data</el-link></span>`,
 
   methods: {
     nodeClick(data, node) {
-      if (node.level==1){
+      if (node.level == 1) {
         this.selectID = data.id;
       }
     },
     onDownload() {
-      const fn = bookDBArray[this.selectID].filename;
+      const fn = workDBArray[this.selectID].filename;
       const form = new FormData();
-      form.append('fileName', fn);
-      form.append('downloadType', 'emb');
-      fetch('/download', {
-        method: 'POST',
+      form.append("fileName", fn);
+      form.append("downloadType", "emb");
+      fetch("/download", {
+        method: "POST",
         body: form,
-        responseType: 'blob',
-      }).then((res)=> {
-        return res.blob()
+        responseType: "blob",
+      }).then((res) => {
+        return res.blob();
       }).then((data) => {
-        const bl = new Blob([data], {type: "text/javascript"})
+        const bl = new Blob([data], { type: "text/javascript" });
         const a = document.createElement("a");
         a.href = window.URL.createObjectURL(bl);
         a.download = `${fn}.json`;
         a.click();
         window.URL.revokeObjectURL(a.href);
-      })
+      });
     },
     onPlot(ind) {
-      const fn = ['qc_control.json','umap_embedding.json', 'umap_embedding3d.json'];
-      fetch('/plot/'+fn[ind], {
-        method: 'GET',
+      const fn = [
+        "qc_control.json",
+        "umap_embedding.json",
+        "umap_embedding3d.json",
+      ];
+      fetch("/plot/" + fn[ind], {
+        method: "GET",
         // responseType: 'blob'
-      }).then((res)=>{
-        return res.json()
-      }).then((fig)=>{
-        fig.layout.height=600
-        fig.layout.width=750
-        PLOTER = document.getElementById('ploter');
-        Plotly.newPlot(PLOTER, fig.data, fig.layout)
-      })
-    }
-  }
+      }).then((res) => {
+        return res.json();
+      }).then((fig) => {
+        fig.layout.height = 600;
+        fig.layout.width = 750;
+        PLOTER = document.getElementById("ploter");
+        Plotly.newPlot(PLOTER, fig.data, fig.layout);
+      });
+    },
+  },
 };
 
 const YunoPage = {
   props: ["pageIndex"],
   components: {
     "yuno-menu": YunoMenu,
-    "book-tree": BookTree
+    "work-tree": WorkTree,
   },
 
   template: `
@@ -254,7 +270,7 @@ const YunoPage = {
       </el-header>
       <el-container>
         <el-aside>
-          <book-tree></book-tree>
+          <work-tree></work-tree>
         </el-aside>
         <el-main>
           <div id="ploter"></div>
@@ -268,7 +284,3 @@ const YunoPage = {
 
 app.component("yuno-page", YunoPage);
 app.mount(".index");
-
-
-	
-
